@@ -41,7 +41,6 @@ function Stopwatch(id) {
   //TODO: CREATE A USE EFFECT TO SAFE DATA TO LOCAL STORAGE
   const idn = id.id;
   const project = localProjects[idn] ?? { stopwatch: { laps: [], time: 0 } };
-
   const initialLaps = project.stopwatch.laps ?? [];
   const initialTime = project.stopwatch.time ?? 0;
   const [laps, setLaps] = createSignal(initialLaps);
@@ -54,7 +53,9 @@ function Stopwatch(id) {
     let newLaps = [...laps()];
     newLaps[index].title = title;
     setLaps(newLaps);
-    project.stopwatch.laps = newLaps;
+    const localProjects = loadFromLocalStorage()
+    localProjects[idn].stopwatch.laps = newLaps;
+
     saveToLocalStorage(localProjects);
   };
 
@@ -71,8 +72,10 @@ function Stopwatch(id) {
     let lapTime = endTime - startTime;
     let newLap = { id: laps().length, title: `Lap ${laps().length + 1}`, start: startTime, end: endTime, time: lapTime };
     setLaps([...laps(), newLap]);
-    project.stopwatch.laps = [...laps()];
-    project.stopwatch.time = time();
+    const localProjects = loadFromLocalStorage()
+    localProjects[idn].stopwatch.laps = [...laps()];
+    localProjects[idn].stopwatch.time = time();
+
     saveToLocalStorage(localProjects);
     startTime = endTime;
   };
