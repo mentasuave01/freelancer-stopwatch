@@ -67,3 +67,25 @@ div {
   border-radius: 0.25rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+.projectWrapper {
+  display: flex;
+  background-color: #d1d1d1;
+  border-radius: 20px;
+  width: calc(100% - 20px);
+
+  padding: 20px;
+}
+
+.projectsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.generatorContainer {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 20px;
+}

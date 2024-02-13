@@ -1,6 +1,16 @@
 import { createSignal, onCleanup } from 'solid-js';
 import Footer from './Footer';
 
+function saveToLocalStorage(projects) {
+  localStorage.setItem('projects', JSON.stringify(projects));
+}
+
+
+
+function loadFromLocalStorage() {
+  const storedProjects = localStorage.getItem('projects');
+  return storedProjects ? JSON.parse(storedProjects) : [];
+}
 
 
 function formatTime(time) {
@@ -78,8 +88,8 @@ function Stopwatch() {
 
   return (
     <>
-      <div class="title">Freelancer Stopwatch</div>
-      <div>{formatTime(time())}</div>
+      <h2>Total Time</h2>
+      <h3>{formatTime(time())}</h3>
       <button onClick={() => running() ? pause() : start()}>{running() ? 'Pause' : 'Start'}</button>
       <button onClick={reset}>Reset</button>
 
@@ -116,13 +126,63 @@ function Record({ title, start, end, index, remove, setTitle }) {
   );
 }
 
+function Project({ name, stopwatch, deleteProject }) {
+  return (
+    <>
+      <main class="projectWrapper">
+        <div>
+          <h1 style={{ color: "#69B00B" }}>{name}</h1>
+          <Stopwatch {...stopwatch} />
+          <button class="btn-remove" onClick={deleteProject}>Delete Project</button>
+        </div>
+      </main>
+    </>
+  );
+}
+
 export default function App() {
+  const [projects, setProjects] = createSignal(loadFromLocalStorage());
+  const [newProjectName, setNewProjectName] = createSignal('');
+
+
+  const addProject = () => {
+    const newProjects = [
+      ...projects(),
+      {
+        name: newProjectName(),
+        stopwatch: {
+          laps: createSignal([]),
+          running: createSignal(false),
+          time: createSignal(0),
+        },
+      },
+    ];
+    setProjects(newProjects);
+    saveToLocalStorage(newProjects);
+  };
+
+  const deleteProject = (index) => {
+    const newProjects = projects().filter((_, i) => i !== index);
+    setProjects(newProjects);
+    saveToLocalStorage(newProjects);
+  };
 
 
   return (
-    <>
-      <Stopwatch />
+    <main class="mainContainer">
+      <div class="generatorContainer">
+        <div class="title">Freelancer Stopwatch</div>
+        <div>
+          <input type="text" value={newProjectName()} onInput={(e) => setNewProjectName(e.target.value)} />
+          <button onClick={addProject}>Add Project</button>
+        </div>
+      </div>
+      <div class="projectsContainer">
+        {projects().map((project, index) => (
+          <Project key={index} {...project} deleteProject={() => deleteProject(index)} />
+        ))}
+      </div>
       <Footer />
-    </>
+    </main>
   );
 }
