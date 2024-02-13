@@ -1,6 +1,23 @@
 import { createSignal, onCleanup } from 'solid-js';
 import Footer from './Footer';
 
+console.log(`
+⠀⠀⠀⠀⠀⠀⢀⠴⠚⠉⠉⠀⠈⠉⠙⢲⡤⠐⠊⠉⠉⠉⠉⠲⡄⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⡴⡁⠀⠀⠀⢀⠤⠤⠤⢤⣀⢱⡀⠀⠀⠀⠀⠀⠀⠘⡄⠀⠀⠀⠀
+⠀⠀⠀⣀⡴⠁⠀⠀⠐⠀⠀⠀⠀⢀⣀⣈⡙⢳⡀⠀⠀⠀⠀⠀⠈⠁⠀⠀⠀⠀
+⠀⢠⢿⠷⡾⢷⣦⣀⠀⢀⡠⣶⡽⢷⣂⣀⠀⠀⣨⣶⣀⣉⠀⢀⣀⡀⠀⣀⣈⣢
+⢰⢾⠀⠀⠁⠀⠈⠙⠷⣶⣛⣿⣶⣷⣿⣿⣿⣿⣿⣿⠋⣯⣭⣿⣿⣿⣿⣿⣿⣿
+⣾⠀⠀⠀⠀⠀⠀⠀⠀⠻⣿⣿⣿⣿⣿⣿⣿⣿⡟⡟⠢⠜⠿⣿⣿⣿⣿⣿⢟⡥
+⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠙⠛⠛⠛⠍⠁⠀⠀⠀⠀⠀⠀⠈⢤⣭⡾⠋⠀
+⡇⠀⠀⠀⠀⠀⠀⠀⣀⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣫⠀⠀
+⣷⣄⠀⠀⠀⠀⠀⠸⡁⢰⣈⠑⠦⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣼⢲⠀
+⣿⣿⣷⣤⣀⠀⠀⠀⠑⢤⣈⠑⠒⠤⠤⢍⣉⣉⣓⣒⣒⣒⣒⣒⣋⣉⣡⢾⠜⠀
+⣿⣿⣿⣿⣿⣿⣶⣤⣀⣀⣀⠉⠉⠓⠲⠶⠤⠤⠤⣄⣀⣀⣀⣀⣀⣤⣿⠟⠀⠀
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⡖⠀⠀⠀⠀⢀⣀⣤⣾⣾⣿⣗⣲⢤⠀
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠒⣠⣾⣿⣿⣿⣿⣿⣿⣿⢿⡧⠐
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣽⣽⣟⣿⣿⣿⣟⡵⠋⠀⠀
+         
+          Created by Mentasuave01`);
 function saveToLocalStorage(projects) {
   localStorage.setItem('projects', JSON.stringify(projects));
 }
@@ -10,14 +27,6 @@ function loadFromLocalStorage() {
   return storedProjects ? JSON.parse(storedProjects) : [];
 }
 const localProjects = loadFromLocalStorage();
-console.log("🚀 ~ loadFromLocalStorage:", loadFromLocalStorage())
-
-// function getProjectData(id) {
-//   const projects = JSON.parse(localStorage.getItem('projects'));
-//   const project = projects[id];
-//   const { laps, time } = project.stopwatch;
-//   return { laps, time };
-// }
 
 
 function formatTime(time) {
@@ -38,11 +47,8 @@ function Stopwatch(id) {
   const [laps, setLaps] = createSignal(initialLaps);
   const [running, setRunning] = createSignal(false);
   const [time, setTime] = createSignal(initialTime);
-  console.log("🚀 ~ Stopwatch ~ time:", time())
   let interval;
   let startTime = 0;
-
-  console.log(localProjects[idn]);
 
   const setTitle = (index, title) => {
     let newLaps = [...laps()];
@@ -147,7 +153,6 @@ function Record({ title, start, end, index, remove, setTitle }) {
 }
 
 function Project({ name, id, deleteProject }) {
-  console.log(name, id);
   return (
     <>
       <main class="projectWrapper">
@@ -184,7 +189,8 @@ export default function App() {
   const deleteProject = (index) => {
     const newProjects = projects().filter((_, i) => i !== index);
     setProjects(newProjects);
-    saveToLocalStorage(newProjects);
+    saveToLocalStorage(newProjects)
+    location.reload();
   };
 
 
