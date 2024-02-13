@@ -170,6 +170,7 @@ export default function App() {
   const [projects, setProjects] = createSignal(localProjects);
   const [newProjectName, setNewProjectName] = createSignal('');
 
+  //TODO: CREATE A USE EFFECT on NewProjects to solve rendering issues
 
   const addProject = () => {
     setProjects(loadFromLocalStorage());
@@ -185,6 +186,7 @@ export default function App() {
     ];
     setProjects(newProjects);
     saveToLocalStorage(newProjects);
+    location.reload();
   };
 
   const deleteProject = (index) => {
