@@ -72,9 +72,8 @@ div {
   display: flex;
   background-color: #d1d1d1;
   border-radius: 20px;
-  width: calc(100% - 20px);
-
-  padding: 20px;
+  width: calc(100% - 40px);
+  padding: 0 20px;
 }
 
 .projectsContainer {
