@@ -5,12 +5,19 @@ function saveToLocalStorage(projects) {
   localStorage.setItem('projects', JSON.stringify(projects));
 }
 
-
-
 function loadFromLocalStorage() {
   const storedProjects = localStorage.getItem('projects');
   return storedProjects ? JSON.parse(storedProjects) : [];
 }
+const localProjects = loadFromLocalStorage();
+console.log("🚀 ~ loadFromLocalStorage:", loadFromLocalStorage())
+
+// function getProjectData(id) {
+//   const projects = JSON.parse(localStorage.getItem('projects'));
+//   const project = projects[id];
+//   const { laps, time } = project.stopwatch;
+//   return { laps, time };
+// }
 
 
 function formatTime(time) {
@@ -21,21 +28,29 @@ function formatTime(time) {
   return `${days}:${hours}:${minutes}:${seconds}`;
 }
 
-function Stopwatch() {
-  const [laps, setLaps] = createSignal([]);
-  const [running, setRunning] = createSignal(false);
-  const [time, setTime] = createSignal(0);
-  let interval;
+function Stopwatch(id) {
+  //TODO: CREATE A USE EFFECT TO SAFE DATA TO LOCAL STORAGE
+  const idn = id.id;
+  const project = localProjects[idn] ?? { stopwatch: { laps: [], time: 0 } };
 
+  const initialLaps = project.stopwatch.laps ?? [];
+  const initialTime = project.stopwatch.time ?? 0;
+  const [laps, setLaps] = createSignal(initialLaps);
+  const [running, setRunning] = createSignal(false);
+  const [time, setTime] = createSignal(initialTime);
+  console.log("🚀 ~ Stopwatch ~ time:", time())
+  let interval;
   let startTime = 0;
+
+  console.log(localProjects[idn]);
 
   const setTitle = (index, title) => {
     let newLaps = [...laps()];
     newLaps[index].title = title;
     setLaps(newLaps);
+    project.stopwatch.laps = newLaps;
+    saveToLocalStorage(localProjects);
   };
-
-
 
   const start = () => {
     setRunning(true);
@@ -50,6 +65,9 @@ function Stopwatch() {
     let lapTime = endTime - startTime;
     let newLap = { id: laps().length, title: `Lap ${laps().length + 1}`, start: startTime, end: endTime, time: lapTime };
     setLaps([...laps(), newLap]);
+    project.stopwatch.laps = [...laps()];
+    project.stopwatch.time = time();
+    saveToLocalStorage(localProjects);
     startTime = endTime;
   };
   const reset = () => {
@@ -61,6 +79,8 @@ function Stopwatch() {
 
   function removeLap(index) {
     setLaps(laps().filter((_, i) => i !== index));
+    project.stopwatch.laps = laps().filter((_, i) => i !== index);
+    saveToLocalStorage(localProjects);
   }
 
   function downloadCSV() {
@@ -126,13 +146,14 @@ function Record({ title, start, end, index, remove, setTitle }) {
   );
 }
 
-function Project({ name, stopwatch, deleteProject }) {
+function Project({ name, id, deleteProject }) {
+  console.log(name, id);
   return (
     <>
       <main class="projectWrapper">
         <div>
           <h1 style={{ color: "#69B00B" }}>{name}</h1>
-          <Stopwatch {...stopwatch} />
+          <Stopwatch id={id} />
           <button class="btn-remove" onClick={deleteProject}>Delete Project</button>
         </div>
       </main>
@@ -141,7 +162,7 @@ function Project({ name, stopwatch, deleteProject }) {
 }
 
 export default function App() {
-  const [projects, setProjects] = createSignal(loadFromLocalStorage());
+  const [projects, setProjects] = createSignal(localProjects);
   const [newProjectName, setNewProjectName] = createSignal('');
 
 
@@ -151,9 +172,8 @@ export default function App() {
       {
         name: newProjectName(),
         stopwatch: {
-          laps: createSignal([]),
-          running: createSignal(false),
-          time: createSignal(0),
+          laps: [],
+          time: 0,
         },
       },
     ];
@@ -179,7 +199,7 @@ export default function App() {
       </div>
       <div class="projectsContainer">
         {projects().map((project, index) => (
-          <Project key={index} {...project} deleteProject={() => deleteProject(index)} />
+          <Project key={index} id={index} {...project} deleteProject={() => deleteProject(index)} />
         ))}
       </div>
       <Footer />
