@@ -190,6 +190,8 @@ export default function App() {
   };
 
   const deleteProject = (index) => {
+    const localProjects = loadFromLocalStorage()
+    setProjects(localProjects);
     const newProjects = projects().filter((_, i) => i !== index);
     setProjects(newProjects);
     saveToLocalStorage(newProjects)
