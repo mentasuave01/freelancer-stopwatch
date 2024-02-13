@@ -88,3 +88,12 @@ div {
 
   gap: 20px;
 }
+
+.btn-start {
+  background-color: #023451;
+}
+
+.btn-pause {
+  background-color: #035c92;
+  box-shadow: 0px 0px 20px 0px #0ff;
+}

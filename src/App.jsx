@@ -47,6 +47,7 @@ function Stopwatch(id) {
   const [running, setRunning] = createSignal(false);
   const [time, setTime] = createSignal(initialTime);
   let interval;
+  let runningTime = 0;
   let startTime = 0;
 
   const setTitle = (index, title) => {
@@ -55,12 +56,12 @@ function Stopwatch(id) {
     setLaps(newLaps);
     const localProjects = loadFromLocalStorage()
     localProjects[idn].stopwatch.laps = newLaps;
-
     saveToLocalStorage(localProjects);
   };
 
   const start = () => {
     setRunning(true);
+    runningTime = Date.now();
     startTime = Date.now() - time();
     interval = setInterval(() => setTime(Date.now() - startTime), 100);
   };
@@ -69,22 +70,17 @@ function Stopwatch(id) {
     setRunning(false);
     clearInterval(interval);
     let endTime = Date.now();
-    let lapTime = endTime - startTime;
-    let newLap = { id: laps().length, title: `Lap ${laps().length + 1}`, start: startTime, end: endTime, time: lapTime };
+    let lapTime = endTime - runningTime;
+    let newLap = { id: laps().length, title: `Lap ${laps().length + 1}`, start: runningTime, end: endTime, time: lapTime };
     setLaps([...laps(), newLap]);
     const localProjects = loadFromLocalStorage()
     localProjects[idn].stopwatch.laps = [...laps()];
     localProjects[idn].stopwatch.time = time();
 
     saveToLocalStorage(localProjects);
-    startTime = endTime;
+    startTime = endTime; // Update the startTime to the current endTime
   };
-  const reset = () => {
-    setTime(0);
-    setLaps([]);
-    clearInterval(interval);
-    setRunning(false);
-  };
+
 
   function removeLap(index) {
     setLaps(laps().filter((_, i) => i !== index));
@@ -119,14 +115,15 @@ function Stopwatch(id) {
     <>
       <h2>Total Time</h2>
       <h3>{formatTime(time())}</h3>
-      <button onClick={() => running() ? pause() : start()}>{running() ? 'Pause' : 'Start'}</button>
-      <button onClick={reset}>Reset</button>
+      <button
+        class={running() ? 'btn-pause' : 'btn-start'}
+        onClick={() => running() ? pause() : start()}>{running() ? '⏸ Pause' : '▶️ Start'}</button>
 
       <div></div>
       <div class="laps-container">
         {laps().map((lap, index) => (
           <div class="lap">
-            <Record title={lap.title} start={lap.start} end={lap.end} index={index} remove={removeLap} setTitle={setTitle} key={lap.id} />
+            <Record title={lap.title} start={lap.start} end={lap.end} index={index} duration={lap.time} remove={removeLap} setTitle={setTitle} key={lap.id} />
           </div>
         ))}
       </div>
@@ -135,7 +132,7 @@ function Stopwatch(id) {
   );
 }
 
-function Record({ title, start, end, index, remove, setTitle }) {
+function Record({ title, start, end, index, remove, setTitle, duration }) {
   let [lapTitle, setLapTitle] = createSignal(title);
 
   const handleTitleChange = (e) => {
@@ -149,7 +146,7 @@ function Record({ title, start, end, index, remove, setTitle }) {
       <input type="text" value={lapTitle()} onBlur={handleTitleChange} />
       <div>Start: {new Date(start).toUTCString()}</div>
       <div>End: {new Date(end).toUTCString()}</div>
-      <div>Duration: {formatTime(end - start)}</div>
+      <div>Duration: {formatTime(duration)}</div>
       <button class="btn-remove" onClick={() => remove(index)}>Remove</button>
     </div>
   );
@@ -175,6 +172,7 @@ export default function App() {
 
 
   const addProject = () => {
+    setProjects(loadFromLocalStorage());
     const newProjects = [
       ...projects(),
       {
