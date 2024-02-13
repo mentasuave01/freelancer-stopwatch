@@ -6,7 +6,10 @@ Feel free to PR and colaborate with this project.
 
 
 
-https://github.com/mentasuave01/freelancer-stopwatch/assets/60361959/172b88ec-4659-4ff6-8bcd-4e203c136abc
+
+https://github.com/mentasuave01/freelancer-stopwatch/assets/60361959/3efc8aaa-6785-4a5a-85a1-7587e87e8244
+
+
 
 
 ## Usage
